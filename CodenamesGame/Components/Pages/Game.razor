@@ -1,0 +1,37 @@
+@page "/game"
+
+<PageTitle>Game</PageTitle>
+
+<h1>These are the tiles</h1>
+
+<div class="grid grid-cols-5 gap-4 w-4/5 m-auto">
+    @foreach (var name in _cardNames)
+    {
+        <Card Name="@name" />
+    }
+</div>
+
+@code 
+{
+    private List<string> _cardNames = new List<string>();
+
+    protected override void OnInitialized()
+    {
+        string filePath = "../CodenamesGame/Data/WordList.txt";
+        if (File.Exists(filePath))
+        {
+            _cardNames = File.ReadAllLines(filePath).ToList();
+        }
+        else 
+        {
+            _cardNames = new List<string> 
+            {
+                "unable",
+                "to",
+                "find",
+                "file",
+                filePath
+            };
+        }
+    }
+}
