@@ -1,37 +1,81 @@
 @page "/game"
+@using CodenamesGame.Models
 
 <PageTitle>Game</PageTitle>
 
 <h1>These are the tiles</h1>
 
 <div class="grid grid-cols-5 gap-4 w-4/5 m-auto">
-    @foreach (var name in _cardNames)
+    @foreach (var card in _cards)
     {
-        <Card Name="@name" />
+        <Card CardInformation="card" />
     }
 </div>
 
 @code 
 {
-    private List<string> _cardNames = new List<string>();
+    private List<CardInformation> _cards = new List<CardInformation>();
 
     protected override void OnInitialized()
     {
         string filePath = "../CodenamesGame/Data/WordList.txt";
         if (File.Exists(filePath))
         {
-            _cardNames = File.ReadAllLines(filePath).ToList();
+            Random random = new Random();
+
+            // create board layout
+            var cardTypes = new List<CardType>();
+            cardTypes.Add(CardType.Assassin);
+            cardTypes.AddRange(Enumerable.Repeat(CardType.Blue, 9));
+            cardTypes.AddRange(Enumerable.Repeat(CardType.Red, 8));
+            cardTypes.AddRange(Enumerable.Repeat(CardType.Neutral, 7));
+            cardTypes = cardTypes.OrderBy(x => random.Next()).ToList();
+
+            // get 25 random cards
+            var cardNames = File.ReadAllLines(filePath)
+                                .OrderBy(x => random.Next())
+                                .Take(25)
+                                .ToList();
+
+            for (int i = 0; i < cardNames.Count; i++)
+            {
+                _cards.Add(new CardInformation 
+                {
+                    Name = cardNames[i],
+                    Type = cardTypes[i]
+                });
+            }
         }
         else 
         {
-            _cardNames = new List<string> 
+            _cards.AddRange(new List<CardInformation>() 
             {
-                "unable",
-                "to",
-                "find",
-                "file",
-                filePath
-            };
+                new CardInformation
+                {
+                    Name = "unable",
+                    Type = CardType.Red
+                },
+                new CardInformation
+                {
+                    Name = "to",
+                    Type = CardType.Neutral
+                },
+                new CardInformation
+                {
+                    Name = "find",
+                    Type = CardType.Assassin
+                },
+                new CardInformation
+                {
+                    Name = "file",
+                    Type = CardType.Neutral
+                },
+                new CardInformation
+                {
+                    Name = filePath,
+                    Type = CardType.Blue
+                },
+            });
         }
     }
 }
